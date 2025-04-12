@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Web AR Example</title>
+        <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+    </head>
+    <body>
+<a-scene embedded arjs="sourceType:webcam；">
+<a-marker preset="hiro">
+    <a-box position="-2 2 -2" rotation="0 60 0" color="#96FED1"></a-box>
+    <a-sphere position="0 1.75 -7" radius="1.25" color="#A6FFFF"></a-sphere>
+    <a-cylinder position="1 0.75 -4" radius="0.5" height="1.5" color="#84C1FF"></a-cylinder>
+</a-marker>
+<a-entity camera></a-entity>
+</a-scene>
+    </body>
+    </html>

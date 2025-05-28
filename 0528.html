@@ -2,59 +2,49 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>MindAR 播放按鈕強化版</title>
+  <title>MindAR 影片播放互動</title>
   <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   <style>
     body { margin: 0; overflow: hidden; }
 
-    /* 強化版播放按鈕樣式 */
+    /* 黑底白邊框播放按鈕 + 白色箭頭 */
     #playButton {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 100px;
-      height: 100px;
-      background-color: rgba(0, 0, 0, 0.7);
-      border: 4px solid white;
+      width: 80px;
+      height: 80px;
+      background-color: black;
+      border: 3px solid white;
       border-radius: 50%;
       cursor: pointer;
       z-index: 10;
       display: none;
-      transition: transform 0.3s ease;
-      animation: pulse 1.5s infinite;
+
       display: flex;
       align-items: center;
       justify-content: center;
+      box-sizing: border-box;
     }
 
     #playButton::before {
-      content: "▶";
-      font-size: 48px;
-      color: white;
-      font-weight: bold;
+      content: "";
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 20px 0 20px 34px;
+      border-color: transparent transparent transparent white;
       margin-left: 5px;
-    }
-
-    #playButton:hover {
-      transform: translate(-50%, -50%) scale(1.1);
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
-      70% { box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
     }
   </style>
 </head>
 <body>
-
   <!-- 播放按鈕 -->
   <button id="playButton"></button>
 
-  <!-- A-Frame + MindAR 場景 -->
+  <!-- A-Frame 場景設定 -->
   <a-scene
     mindar-image="imageTargetSrc: targets.mind; autoStart: true; uiScanning: true;"
     color-space="sRGB"
@@ -63,7 +53,7 @@
     device-orientation-permission-ui="enabled: false"
   >
     <a-assets>
-      <video id="introVid" src="video-1.mp4" preload="auto" playsinline muted></video>
+      <video id="introVid" src="video-1.mp4" preload="auto" muted playsinline></video>
     </a-assets>
 
     <a-light type="ambient" intensity="1.5"></a-light>
@@ -73,8 +63,7 @@
       <a-video
         id="videoEntity"
         src="#introVid"
-        width="0.7"
-        height="1.2"
+        width="0.7" height="1.2"
         autoplay="false"
         loop="false"
         material="shader: flat"
@@ -89,7 +78,6 @@
     const targetEntity = document.querySelector('a-entity[mindar-image-target]');
     const playButton = document.getElementById('playButton');
 
-    // 確保影片初始靜音與暫停
     video.pause();
     video.currentTime = 0;
 
@@ -104,7 +92,7 @@
       }
     });
 
-    // 點擊影片切換播放狀態
+    // 點擊影片切換播放/暫停
     videoPlane.addEventListener('click', () => {
       if (video.paused) {
         video.play();
@@ -113,26 +101,23 @@
       }
     });
 
-    // 掃描到圖卡才顯示播放按鈕
+    // 掃描到 Marker 顯示按鈕
     targetEntity.addEventListener('targetFound', () => {
-      if (video.paused) {
-        playButton.style.display = 'flex';
-      }
+      playButton.style.display = 'block';
     });
 
-    // 圖卡失去時隱藏按鈕與重設影片
+    // Marker 遺失時隱藏按鈕、暫停影片
     targetEntity.addEventListener('targetLost', () => {
       video.pause();
       video.currentTime = 0;
       playButton.style.display = 'none';
     });
 
-    // 播放結束後重新顯示播放按鈕
+    // 影片播放完畢 → 顯示按鈕
     video.addEventListener('ended', () => {
-      playButton.style.display = 'flex';
       video.currentTime = 0;
+      playButton.style.display = 'block';
     });
   </script>
-
 </body>
 </html>

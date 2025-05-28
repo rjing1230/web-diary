@@ -21,9 +21,7 @@
       border-radius: 8px;
       cursor: pointer;
       z-index: 10;
-    }
-    #playButton.hidden {
-      display: none;
+      display: none; /* 初始隱藏 */
     }
   </style>
 </head>
@@ -40,21 +38,19 @@
     device-orientation-permission-ui="enabled: false"
   >
     <a-assets>
-      <!-- 初始靜音 -->
       <video id="introVid" src="video-1.mp4" preload="auto" muted playsinline></video>
     </a-assets>
 
     <a-light type="ambient" intensity="1.5"></a-light>
     <a-camera look-controls="enabled: false"></a-camera>
 
-    <!-- 掃描到圖卡後顯示影片平面 -->
     <a-entity mindar-image-target="targetIndex: 0">
       <a-video
         id="videoEntity"
         src="#introVid"
         width="0.7" height="1.2"
         autoplay="false"
-        loop="true"
+        loop="false"
         material="shader: flat"
         position="0 0 0">
       </a-video>
@@ -67,13 +63,13 @@
     const targetEntity = document.querySelector('a-entity[mindar-image-target]');
     const playButton = document.getElementById('playButton');
 
-    // 初始影片暫停
+    // 初始狀態
     video.pause();
     video.currentTime = 0;
 
-    // 使用者點擊播放按鈕時，開始播放並取消靜音
+    // 點擊播放按鈕：取消靜音、播放、隱藏按鈕
     playButton.addEventListener('click', async () => {
-      playButton.classList.add('hidden');
+      playButton.style.display = 'none';
       video.muted = false;
       try {
         await video.play();
@@ -82,7 +78,7 @@
       }
     });
 
-    // 點擊影片平面也可播放／暫停（可選）
+    // 點擊影片切換播放（可選）
     videoPlane.addEventListener('click', () => {
       if (video.paused) {
         video.play();
@@ -91,15 +87,22 @@
       }
     });
 
-    // 掃描到 marker 時顯示影片，但不會自動播放
+    // 掃描到 marker 顯示播放按鈕
     targetEntity.addEventListener('targetFound', () => {
-      console.log('Target Found');
+      playButton.style.display = 'block';
     });
 
-    // marker 消失時停止影片
+    // marker 遺失時：暫停影片、重置、隱藏按鈕
     targetEntity.addEventListener('targetLost', () => {
       video.pause();
       video.currentTime = 0;
+      playButton.style.display = 'none';
+    });
+
+    // 影片播放完畢時：顯示按鈕、重置播放時間
+    video.addEventListener('ended', () => {
+      video.currentTime = 0;
+      playButton.style.display = 'block';
     });
   </script>
 </body>

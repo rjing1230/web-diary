@@ -8,7 +8,7 @@
   <style>
     body { margin: 0; overflow: hidden; }
 
-    /* 黑底白邊框播放按鈕 + 白色箭頭 */
+    /* 播放按鈕樣式：黑色圓形 + 白色邊框 + 白色播放箭頭 */
     #playButton {
       position: absolute;
       top: 50%;
@@ -22,7 +22,6 @@
       cursor: pointer;
       z-index: 10;
       display: none;
-
       display: flex;
       align-items: center;
       justify-content: center;
@@ -44,7 +43,7 @@
   <!-- 播放按鈕 -->
   <button id="playButton"></button>
 
-  <!-- A-Frame 場景設定 -->
+  <!-- A-Frame + MindAR 場景 -->
   <a-scene
     mindar-image="imageTargetSrc: targets.mind; autoStart: true; uiScanning: true;"
     color-space="sRGB"
@@ -72,12 +71,15 @@
     </a-entity>
   </a-scene>
 
+  <!-- 互動邏輯 -->
   <script>
     const video = document.querySelector('#introVid');
     const videoPlane = document.querySelector('#videoEntity');
     const targetEntity = document.querySelector('a-entity[mindar-image-target]');
     const playButton = document.getElementById('playButton');
 
+    // 初始狀態：隱藏按鈕
+    playButton.style.display = 'none';
     video.pause();
     video.currentTime = 0;
 
@@ -92,7 +94,7 @@
       }
     });
 
-    // 點擊影片切換播放/暫停
+    // 點影片切換播放/暫停（可選功能）
     videoPlane.addEventListener('click', () => {
       if (video.paused) {
         video.play();
@@ -101,19 +103,21 @@
       }
     });
 
-    // 掃描到 Marker 顯示按鈕
+    // 掃描到圖卡：如果影片沒在播才顯示按鈕
     targetEntity.addEventListener('targetFound', () => {
-      playButton.style.display = 'block';
+      if (video.paused) {
+        playButton.style.display = 'block';
+      }
     });
 
-    // Marker 遺失時隱藏按鈕、暫停影片
+    // 遺失圖卡：暫停並重設影片、隱藏按鈕
     targetEntity.addEventListener('targetLost', () => {
       video.pause();
       video.currentTime = 0;
       playButton.style.display = 'none';
     });
 
-    // 影片播放完畢 → 顯示按鈕
+    // 播放結束 → 顯示按鈕
     video.addEventListener('ended', () => {
       video.currentTime = 0;
       playButton.style.display = 'block';

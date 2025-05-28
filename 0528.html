@@ -8,16 +8,16 @@
   <style>
     body { margin: 0; overflow: hidden; }
 
-    /* 播放按鈕樣式：黑色圓形 + 白色邊框 + 白色播放箭頭 */
+    /* 播放按鈕（縮小版）黑底 + 白框 + 白色箭頭 */
     #playButton {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 80px;
-      height: 80px;
+      width: 60px;
+      height: 60px;
       background-color: black;
-      border: 3px solid white;
+      border: 2.5px solid white;
       border-radius: 50%;
       cursor: pointer;
       z-index: 10;
@@ -33,9 +33,9 @@
       width: 0;
       height: 0;
       border-style: solid;
-      border-width: 20px 0 20px 34px;
+      border-width: 12px 0 12px 20px;
       border-color: transparent transparent transparent white;
-      margin-left: 5px;
+      margin-left: 3px;
     }
   </style>
 </head>
@@ -71,17 +71,17 @@
     </a-entity>
   </a-scene>
 
-  <!-- 互動邏輯 -->
+  <!-- 控制邏輯 -->
   <script>
     const video = document.querySelector('#introVid');
     const videoPlane = document.querySelector('#videoEntity');
     const targetEntity = document.querySelector('a-entity[mindar-image-target]');
     const playButton = document.getElementById('playButton');
 
-    // 初始狀態：隱藏按鈕
-    playButton.style.display = 'none';
+    // 預設暫停影片並隱藏按鈕
     video.pause();
     video.currentTime = 0;
+    playButton.style.display = 'none';
 
     // 點擊播放按鈕
     playButton.addEventListener('click', async () => {
@@ -94,33 +94,33 @@
       }
     });
 
-    // 點影片切換播放/暫停（可選功能）
-    videoPlane.addEventListener('click', () => {
-      if (video.paused) {
-        video.play();
-      } else {
-        video.pause();
-      }
-    });
-
-    // 掃描到圖卡：如果影片沒在播才顯示按鈕
+    // 掃到圖卡 → 如果影片沒在播，顯示播放按鈕
     targetEntity.addEventListener('targetFound', () => {
       if (video.paused) {
-        playButton.style.display = 'block';
+        playButton.style.display = 'flex';
       }
     });
 
-    // 遺失圖卡：暫停並重設影片、隱藏按鈕
+    // 圖卡遺失 → 暫停影片 + 隱藏按鈕
     targetEntity.addEventListener('targetLost', () => {
       video.pause();
       video.currentTime = 0;
       playButton.style.display = 'none';
     });
 
-    // 播放結束 → 顯示按鈕
+    // 播放完畢 → 顯示播放按鈕
     video.addEventListener('ended', () => {
       video.currentTime = 0;
-      playButton.style.display = 'block';
+      playButton.style.display = 'flex';
+    });
+
+    // 可選：點擊影片播放面板本身可切換播放／暫停
+    videoPlane.addEventListener('click', () => {
+      if (video.paused) {
+        video.play();
+      } else {
+        video.pause();
+      }
     });
   </script>
 </body>
